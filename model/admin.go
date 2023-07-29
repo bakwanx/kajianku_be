@@ -1,4 +1,4 @@
-package domain
+package model
 
 type UserAdmin struct {
 	Id       int    `gorm:"primarykey" json:"id" form:"id"`
