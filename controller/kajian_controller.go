@@ -1,25 +1,70 @@
 package controller
 
 import (
+	"context"
+	"fmt"
+	"kajianku_be/config"
 	"kajianku_be/model"
 	"net/http"
+	"strconv"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
+	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/labstack/echo/v4"
 )
 
 func PostKajian(db DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		user := model.User{}
-		kajian := model.Kajian{}
-		c.Bind(&kajian)
+
+		IdUser, _ := strconv.Atoi(c.FormValue("id_user"))
+		title := c.FormValue("title")
+		description := c.FormValue("description")
+		date := c.FormValue("date")
+		file, err := c.FormFile("poster")
+
+		//kajianku
+		//ngpM1[uy
+		//https://980513943829.signin.aws.amazon.com/console
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{
+				"status":  http.StatusInternalServerError,
+				"message": err.Error(),
+			})
+		}
+
+		src, err := file.Open()
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{
+				"status":  http.StatusInternalServerError,
+				"message": err.Error(),
+			})
+		}
+		defer src.Close()
+
+		result, err := config.Uploader.Upload(context.TODO(), &s3.PutObjectInput{
+			Bucket: aws.String("kajianku-bucket"),
+			Key:    aws.String(file.Filename),
+			Body:   src,
+			ACL:    "public-read",
+		})
+
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{
+				"status":  http.StatusInternalServerError,
+				"message": err.Error(),
+			})
+		}
+		fmt.Println(result)
 
 		// check user status
-		err := db.Where("id_kajian  = ? AND status = ?", kajian.IdUser, 1).First(&user).Error
+		err = db.Where("id_user  = ? AND status = ?", IdUser, 1).First(&user).Error
 		if user.Email == "" {
 			return c.JSON(http.StatusNotFound, echo.Map{
 				"status":  http.StatusNotFound,
-				"message": "user not found",
+				"message": user.IdUser,
 			})
 		}
 		if err != nil {
@@ -27,6 +72,14 @@ func PostKajian(db DB) echo.HandlerFunc {
 				"status":  http.StatusNotAcceptable,
 				"message": "user unverified",
 			})
+		}
+
+		kajian := model.Kajian{
+			IdUser:      IdUser,
+			Title:       title,
+			Description: description,
+			Date:        date,
+			Poster:      result.Location,
 		}
 
 		// parse format time

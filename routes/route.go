@@ -2,6 +2,7 @@ package routes
 
 import (
 	"kajianku_be/config"
+	"os"
 
 	"kajianku_be/controller"
 	m "kajianku_be/middleware"
@@ -26,11 +27,11 @@ func New() *echo.Echo {
 	e.POST("/login", controller.Login(db))
 
 	eJwt := e.Group("")
-	eJwt.Use(mid.JWT([]byte(config.SECRET_JWT)))
+	eJwt.Use(mid.JWT([]byte(os.Getenv("SECRET_JWT"))))
 	eJwt.GET("/users", controller.GetAllUsers(db))
 	eJwt.POST("/mosque", controller.RegisterMosque(db))
 	eJwt.GET("/mosque/:id_user", controller.GetMosqueByUserId(db))
-	// eJwt.POST("/kajian", controller.PostKajian(db))
+	eJwt.POST("/kajian", controller.PostKajian(db))
 	eJwt.GET("/kajian/:distance/:latitude/:longitude", controller.GetKajianByDistance(db))
 	return e
 }
