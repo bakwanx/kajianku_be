@@ -16,10 +16,10 @@ func New() *echo.Echo {
 		panic(err)
 	}
 
-	err = config.MigrateDB(db)
-	if err != nil {
-		panic(err)
-	}
+	// err = config.MigrateDB(db)
+	// if err != nil {
+	// 	panic(err)
+	// }
 	e := echo.New()
 	m.LogMiddleware(e)
 	e.POST("/register", controller.Register(db))
@@ -30,5 +30,7 @@ func New() *echo.Echo {
 	eJwt.GET("/users", controller.GetAllUsers(db))
 	eJwt.POST("/mosque", controller.RegisterMosque(db))
 	eJwt.GET("/mosque/:id_user", controller.GetMosqueByUserId(db))
+	// eJwt.POST("/kajian", controller.PostKajian(db))
+	eJwt.GET("/kajian/:distance/:latitude/:longitude", controller.GetKajianByDistance(db))
 	return e
 }

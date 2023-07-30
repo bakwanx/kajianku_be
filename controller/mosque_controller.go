@@ -39,7 +39,6 @@ func RegisterMosque(db DB) echo.HandlerFunc {
 func GetMosqueByUserId(db DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
 		idUser := c.Param("id_user")
-		user := model.User{}
 		mosque := model.Mosque{}
 
 		errMosque := db.Where("id_user  = ?", idUser).First(&mosque).Error
@@ -50,20 +49,10 @@ func GetMosqueByUserId(db DB) echo.HandlerFunc {
 			})
 		}
 
-		// check user status
-		err := db.Where("id  = ? AND status = ?", idUser, 1).First(&user).Error
-		if err != nil {
-			return c.JSON(http.StatusNotAcceptable, echo.Map{
-				"status":  http.StatusNotAcceptable,
-				"message": "user unverified",
-			})
-		}
-
 		return c.JSON(http.StatusOK, echo.Map{
 			"status":  http.StatusOK,
 			"message": "success",
 			"data":    mosque,
-			"idUser":  idUser,
 		})
 	}
 }

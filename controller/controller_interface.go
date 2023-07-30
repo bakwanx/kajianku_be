@@ -7,4 +7,5 @@ type DB interface {
 	Where(query interface{}, args ...interface{}) *gorm.DB
 	Create(value interface{}) *gorm.DB
 	Delete(value interface{}, conds ...interface{}) *gorm.DB
+	Raw(sql string, values ...interface{}) *gorm.DB
 }

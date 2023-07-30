@@ -29,12 +29,12 @@ func GetAllUsers(db DB) echo.HandlerFunc {
 
 func Delete(db DB) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		id := c.Param("id")
+		idUser := c.Param("id_user")
 		var user model.User
 		var mosque model.Mosque
 
 		// delete user
-		if err := db.Delete(&user, id).Error; err != nil {
+		if err := db.Delete(&user, idUser).Error; err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"status":  http.StatusInternalServerError,
 				"message": err.Error(),
@@ -42,7 +42,7 @@ func Delete(db DB) echo.HandlerFunc {
 		}
 
 		// delete mosque
-		if err := db.Where("id_user = ?", id).Delete(&mosque, id).Error; err != nil {
+		if err := db.Where("id_user = ?", idUser).Delete(&mosque, idUser).Error; err != nil {
 			return c.JSON(http.StatusInternalServerError, echo.Map{
 				"status":  http.StatusInternalServerError,
 				"message": err.Error(),
@@ -86,7 +86,7 @@ func Register(db DB) echo.HandlerFunc {
 		}
 
 		userResponse := model.UserRegisterResponse{
-			Id:       user.Id,
+			IdUser:   user.IdUser,
 			Email:    user.Email,
 			Fullname: user.Fullname,
 		}
@@ -127,10 +127,10 @@ func Login(db DB) echo.HandlerFunc {
 			})
 		}
 
-		token, _ := middleware.CreateToken(user.Id, user.Fullname)
+		token, _ := middleware.CreateToken(user.IdUser, user.Fullname)
 
 		userResponse := model.UserLoginResponse{
-			Id:       user.Id,
+			IdUser:   user.IdUser,
 			Email:    user.Email,
 			Fullname: user.Fullname,
 			Token:    token,

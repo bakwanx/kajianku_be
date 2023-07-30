@@ -7,11 +7,11 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-func CreateToken(id int, name string) (string, error) {
+func CreateToken(id int, fullname string) (string, error) {
 	claims := jwt.MapClaims{}
 	claims["id"] = id
-	claims["fullname"] = name
-	claims["exp"] = time.Now().Add(time.Hour * 240).Unix()
+	claims["fullname"] = fullname
+	claims["exp"] = time.Now().Add(time.Hour * 24).Unix()
 
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
 

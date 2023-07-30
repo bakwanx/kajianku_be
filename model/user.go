@@ -1,7 +1,7 @@
 package model
 
 type User struct {
-	Id       int    `gorm:"primarykey" json:"id" form:"id"`
+	IdUser   int    `gorm:"primarykey" json:"id_user" form:"id_user"`
 	Fullname string `json:"fullname" form:"fullname"`
 	Email    string `json:"email" form:"email"`
 	Password string `json:"password" form:"password"`
@@ -9,14 +9,14 @@ type User struct {
 }
 
 type UserLoginResponse struct {
-	Id       int    `json:"id" form:"id"`
+	IdUser   int    `json:"id_user" form:"id_user"`
 	Fullname string `json:"fullname" form:"fullname"`
 	Email    string `json:"email" form:"email"`
 	Token    string `json:"token" form:"token"`
 }
 
 type UserRegisterResponse struct {
-	Id       int    `json:"id" form:"id"`
+	IdUser   int    `json:"id_user" form:"id_user"`
 	Fullname string `json:"fullname" form:"fullname"`
 	Email    string `json:"email" form:"email"`
 }
