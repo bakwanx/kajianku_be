@@ -2,7 +2,6 @@ package controller
 
 import (
 	"context"
-	"fmt"
 	"kajianku_be/config"
 	"kajianku_be/model"
 	"net/http"
@@ -24,14 +23,21 @@ func PostKajian(db DB) echo.HandlerFunc {
 		date := c.FormValue("date")
 		file, err := c.FormFile("poster")
 
-		//kajianku
-		//ngpM1[uy
-		//https://980513943829.signin.aws.amazon.com/console
-
+		// check user status
+		err = db.Where("id_user  = ? AND status = ?", IdUser, 1).First(&user).Error
 		if err != nil {
-			return c.JSON(http.StatusInternalServerError, echo.Map{
-				"status":  http.StatusInternalServerError,
-				"message": err.Error(),
+			return c.JSON(http.StatusNotAcceptable, echo.Map{
+				"status":  http.StatusNotAcceptable,
+				"message": "user unverified",
+			})
+		}
+
+		// check format time
+		_, err = time.Parse("02/01/2006", date)
+		if err != nil {
+			return c.JSON(http.StatusNotAcceptable, echo.Map{
+				"status":  http.StatusNotAcceptable,
+				"message": "accepted format 'dd/MM/yyyy'",
 			})
 		}
 
@@ -57,22 +63,6 @@ func PostKajian(db DB) echo.HandlerFunc {
 				"message": err.Error(),
 			})
 		}
-		fmt.Println(result)
-
-		// check user status
-		err = db.Where("id_user  = ? AND status = ?", IdUser, 1).First(&user).Error
-		if user.Email == "" {
-			return c.JSON(http.StatusNotFound, echo.Map{
-				"status":  http.StatusNotFound,
-				"message": user.IdUser,
-			})
-		}
-		if err != nil {
-			return c.JSON(http.StatusNotAcceptable, echo.Map{
-				"status":  http.StatusNotAcceptable,
-				"message": "user unverified",
-			})
-		}
 
 		kajian := model.Kajian{
 			IdUser:      IdUser,
@@ -80,15 +70,6 @@ func PostKajian(db DB) echo.HandlerFunc {
 			Description: description,
 			Date:        date,
 			Poster:      result.Location,
-		}
-
-		// parse format time
-		_, err = time.Parse("02/01/2006", kajian.Date)
-		if err != nil {
-			return c.JSON(http.StatusNotAcceptable, echo.Map{
-				"status":  http.StatusNotAcceptable,
-				"message": "accepted format 'dd/MM/yyyy'",
-			})
 		}
 
 		// create kajian
