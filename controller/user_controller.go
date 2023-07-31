@@ -130,9 +130,9 @@ func Login(db DB) echo.HandlerFunc {
 		token, _ := middleware.CreateToken(user.IdUser, user.Fullname)
 
 		userResponse := model.UserLoginResponse{
-			IdUser:   user.IdUser,
-			Email:    user.Email,
-			Fullname: user.Fullname,
+			IdUser:   dbUser.IdUser,
+			Email:    dbUser.Email,
+			Fullname: dbUser.Fullname,
 			Token:    token,
 		}
 
@@ -142,4 +142,48 @@ func Login(db DB) echo.HandlerFunc {
 			"data":    userResponse,
 		})
 	}
+}
+
+func UpdateUser(db DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		idUser := c.Param("id_user")
+
+		// check user
+		checkUser := model.User{}
+		db.Where("id_user = ?", idUser).First(&checkUser)
+		if checkUser.Fullname == "" {
+			return c.JSON(http.StatusNotFound, echo.Map{
+				"status":  http.StatusNotFound,
+				"message": "User not found",
+			})
+		}
+
+		var user model.User
+		c.Bind(&user)
+		// check password
+		if user.Password != "" {
+			// encrypt password
+			hashedPassword, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
+			user.Password = string(hashedPassword)
+
+			if err := db.Where("id_user", idUser).Updates(&user).Error; err != nil {
+				return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+					"status":  http.StatusInternalServerError,
+					"message": err.Error(),
+				})
+			}
+		}
+
+		if err := db.Where("id_user", idUser).Updates(&user).Error; err != nil {
+			return c.JSON(http.StatusInternalServerError, map[string]interface{}{
+				"status":  http.StatusInternalServerError,
+				"message": err.Error(),
+			})
+		}
+		return c.JSON(http.StatusOK, map[string]interface{}{
+			"status":  http.StatusOK,
+			"message": "success update",
+		})
+	}
+
 }
