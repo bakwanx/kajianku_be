@@ -168,3 +168,23 @@ func UpdateUserAdmin(db DB) echo.HandlerFunc {
 	}
 
 }
+
+func GetAllUsersByStatus(db DB) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		users := make([]model.User, 0)
+		status := c.Param("status")
+
+		err := db.Find(&users, "status = ?", status).Error
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, echo.Map{
+				"status":  http.StatusInternalServerError,
+				"message": err.Error(),
+			})
+		}
+		return c.JSON(http.StatusOK, echo.Map{
+			"status":  http.StatusOK,
+			"message": "success",
+			"data":    users,
+		})
+	}
+}
