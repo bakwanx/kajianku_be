@@ -44,8 +44,11 @@ func New() *echo.Echo {
 	eJwt.PATCH("/kajian/:id_kajian", controller.UpdateKajian(db))
 	eJwt.GET("/kajian/:distance/:latitude/:longitude", controller.GetKajianByDistance(db))
 
+	// Admin
 	admin := e.Group("admin")
 	admin.POST("/register", controller.RegisterAdmin(db))
 	admin.POST("/login", controller.LoginAdmin(db))
+	admin.PATCH("/approve", controller.ApproveUser(db))
+	admin.PATCH("/:id_user", controller.UpdateUserAdmin(db))
 	return e
 }
