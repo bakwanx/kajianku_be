@@ -110,6 +110,7 @@ func GetKajianByDistance(db DB) echo.HandlerFunc {
 			mosques.id_mosque,
 			mosques.mosque_name,
 			mosques.image,
+			mosques.address,
 			mosques.latitude,
 			mosques.longitude, 
 			( 6371 * acos ( 
