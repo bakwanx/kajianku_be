@@ -50,5 +50,6 @@ func New() *echo.Echo {
 	admin.POST("/login", controller.LoginAdmin(db))
 	admin.PATCH("/approve", controller.ApproveUser(db))
 	admin.PATCH("/:id_user", controller.UpdateUserAdmin(db))
+	admin.GET("/users/:status", controller.GetAllUsersByStatus(db))
 	return e
 }
