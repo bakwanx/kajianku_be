@@ -1,0 +1,10 @@
+services:
+
+  app:
+    image: golang_container
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    ports: # host:container
+      - "8080:8080"
+    restart: always
