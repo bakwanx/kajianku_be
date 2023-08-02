@@ -91,12 +91,11 @@ func PostKajian(db DB) echo.HandlerFunc {
 }
 
 func GetKajianByDistance(db DB) echo.HandlerFunc {
-	var kajianResponse = []model.KajianByDistanceResponse{}
 	return func(c echo.Context) error {
 		distance := c.Param("distance")
 		latitude := c.Param("latitude")
 		longitude := c.Param("longitude")
-
+		var kajianResponse = []model.KajianByDistanceResponse{}
 		if distance == "" {
 			distance = "5"
 		}
