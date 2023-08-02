@@ -25,6 +25,7 @@ func New() *echo.Echo {
 	m.LogMiddleware(e)
 	e.POST("/register", controller.Register(db))
 	e.POST("/login", controller.Login(db))
+	e.GET("/kajian/:distance/:latitude/:longitude", controller.GetKajianByDistance(db))
 
 	eJwt := e.Group("")
 	eJwt.Use(mid.JWT([]byte(os.Getenv("SECRET_JWT"))))
@@ -42,7 +43,6 @@ func New() *echo.Echo {
 	eJwt.POST("/kajian", controller.PostKajian(db))
 	eJwt.DELETE("/kajian/:id_kajian", controller.DeleteKajian(db))
 	eJwt.PATCH("/kajian/:id_kajian", controller.UpdateKajian(db))
-	eJwt.GET("/kajian/:distance/:latitude/:longitude", controller.GetKajianByDistance(db))
 
 	// Admin
 	admin := e.Group("admin")
